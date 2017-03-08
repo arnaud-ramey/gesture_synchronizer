@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GestureGui</class>
+ <widget class="QMainWindow" name="GestureGui">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>443</width>
+    <height>312</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>1</horstretch>
+    <verstretch>1</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../../../../usr/share/icons/gnome/32x32/apps/gnome-settings-accessibility-technologies.png</normaloff>../../../../../usr/share/icons/gnome/32x32/apps/gnome-settings-accessibility-technologies.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>1</horstretch>
+     <verstretch>1</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QGridLayout" name="central_layout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetNoConstraint</enum>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QSlider" name="time_slider">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximum">
+       <number>200</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
+      <property name="tickInterval">
+       <number>10</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="time_slider_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>t=...s</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="key_jts">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Keyframe joints:</string>
+      </property>
+      <layout class="QVBoxLayout" name="key_jts_layout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QGroupBox" name="sub_jts">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Subscribed joints:</string>
+      </property>
+      <layout class="QVBoxLayout" name="sub_jts_layout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="play_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Play gesture</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../usr/share/icons/gnome/32x32/actions/gtk-media-play-ltr.png</normaloff>../../../../../usr/share/icons/gnome/32x32/actions/gtk-media-play-ltr.png</iconset>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="move_to_current_button">
+      <property name="text">
+       <string>Move robot to current</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../usr/share/icons/gnome/32x32/actions/view-sort-ascending.png</normaloff>../../../../../usr/share/icons/gnome/32x32/actions/view-sort-ascending.png</iconset>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>443</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <pointsize>7</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+  </widget>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../../../usr/share/icons/gnome/16x16/actions/gtk-open.png</normaloff>../../../../../usr/share/icons/gnome/16x16/actions/gtk-open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../../../usr/share/icons/gnome/16x16/actions/gtk-save.png</normaloff>../../../../../usr/share/icons/gnome/16x16/actions/gtk-save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../../../usr/share/icons/gnome/16x16/actions/gtk-quit.png</normaloff>../../../../../usr/share/icons/gnome/16x16/actions/gtk-quit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

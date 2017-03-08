@@ -1,0 +1,3 @@
+- git:
+    local-name: gesture_msgs
+    uri: https://github.com/arnaud-ramey/gesture_msgs.git

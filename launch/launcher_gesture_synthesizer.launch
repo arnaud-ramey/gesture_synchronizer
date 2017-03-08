@@ -1,0 +1,85 @@
+<!--
+  This launcher execute all nodes relatives to perform a gesture
+  -->
+<launch>
+    <arg name="robot" value="alz"/>
+
+    <group ns="$(arg robot)">
+
+
+        <!-- the publisher for the message gathering the state of all joints at once -->
+        <node name="joint_states_publisher"
+            pkg="dynamixel"
+            type="joint_states_publisher"
+            args="_wait_for_all_joints:=true _joints:=leftArm;rightArm;neck;head"
+            output="screen" />
+
+        <!-- the node commander, for commanding all the servos at once -->
+        <node name="joint_states_commander" pkg="dynamixel" type="joint_states_commander"
+            args="_input_topic:=joints_command" output="screen" />
+
+        <!--  Controllers -->
+         <node name="servos_manager"
+            pkg="dynamixel_controllers"
+            type="controller_manager.py"
+            output="screen">
+            <param name="namespace" type="str" value="servos" />
+            <param name="serial_ports/servos/port_name" type="str" value="/dev/servos"/>
+            <param name="serial_ports/servos/baud_rate" type="int" value="1000000"/>
+            <param name="serial_ports/servos/min_motor_id" type="int" value="1"/>
+            <param name="serial_ports/servos/max_motor_id" type="int" value="5"/>
+            <param name="serial_ports/servos/update_rate" type="int" value="10"/>
+        </node>
+
+        <rosparam file="$(find dynamixel)/config/alz_velocity_controllers.yaml" command="load"/>
+        <!-- <rosparam file="$(find dynamixel)/config/alz_position_controllers.yaml" command="load"/> -->
+
+        <node name="tilt_controller_spawner" pkg="dynamixel_controllers"
+            type="controller_spawner.py"
+            args="--port servos
+            --manager servos
+            base rightArm leftArm neck head"
+            output="screen"/>
+
+
+        <!-- the gesture synthesiser -->
+        <node pkg="gesture_player" type="gesture_dynamixel_player_ros" output="screen"
+            name="gesture_dynamixel_player_ros_joint1" args="_joint_name:=base" required="true" />
+        <node pkg="gesture_player" type="gesture_dynamixel_player_ros" output="screen"
+            name="gesture_dynamixel_player_ros_joint2" args="_joint_name:=leftArm" required="true" />
+        <node pkg="gesture_player" type="gesture_dynamixel_player_ros" output="screen"
+            name="gesture_dynamixel_player_ros_joint3" args="_joint_name:=rightArm" required="true" />
+        <node pkg="gesture_player" type="gesture_dynamixel_player_ros" output="screen"
+            name="gesture_dynamixel_player_ros_joint4" args="_joint_name:=neck" required="true" />
+        <node pkg="gesture_player" type="gesture_dynamixel_player_ros" output="screen"
+            name="gesture_dynamixel_player_ros_joint5" args="_joint_name:=head" required="true" />
+        <node pkg="gesture_player" type="gesture_etts_player_ros" output="screen"
+            name="gesture_etts_player_ros" args="_joint_name:=etts" />
+        <node pkg="gesture_player" type="gesture_led_player_ros" output="screen"
+            name="gesture_led_player_ros" args="_joint_name:=led" />
+        <node pkg="gesture_player" type="gesture_smart_leds_player_ros" output="screen"
+            name="gesture_smart_leds_player_ros_heart" args="_joint_name:=heart" />
+        <node pkg="gesture_player" type="gesture_smart_leds_player_ros" output="screen"
+            name="gesture_smart_leds_player_ros_cheeks" args="_joint_name:=cheeks" />
+        <node pkg="gesture_player" type="gesture_screens_player_ros" output="screen"
+            name="gesture_screens_player_ros" args="_joint_name:=screens" />
+
+        <!-- the gesture_string_publisher, converting XML filenames into proper gestures -->
+        <node pkg="gesture_player" type="gesture_string_publisher" output="screen"
+             name="gesture_string_publisher" args="" />
+    </group>
+
+
+    <!-- Launch the arduino leds -->
+    <include
+        file="$(find arduino_manager)/launch/arduino_manager.launch">
+        <arg name="robot" value="$(arg robot)"/>
+    </include>
+
+    <!-- Launch the controller for the screens -->
+    <include file="$(find screens)/launch/screens_node.launch">
+        <arg name="robot" value="$(arg robot)" />
+    </include>
+
+
+</launch>
