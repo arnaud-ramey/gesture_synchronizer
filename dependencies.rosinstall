@@ -1,3 +1,6 @@
 - git:
     local-name: gesture_msgs
     uri: https://github.com/arnaud-ramey/gesture_msgs.git
+- git:
+    local-name: vision_utils
+    uri: https://github.com/UC3MSocialRobots/vision_utils.git

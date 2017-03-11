@@ -1,17 +1,13 @@
 #ifndef SIMPLE_PLAYER_H
 #define SIMPLE_PLAYER_H
-
-// ROS
+// gesture_synchronizer
 #include "gesture_synchronizer/joint_player.h"
 #include <vision_utils/to_lowercase.h>
-#include <vision_utils/cast_from_string.h>
+#include <vision_utils/string2msg.h>
 
 template<class _Msg>
 class SimplePlayer : public JointPlayer {
 public:
-  //! alias for the C type: bool, int, float, etc.
-  typedef typename _Msg::_data_type  _Type;
-
   SimplePlayer(const std::string & joint_name = "",
                const std::string & out_topic_name = "out")
     : JointPlayer(joint_name) {
@@ -36,21 +32,24 @@ public:
       ROS_INFO("%s: Sleeping till %f, then sending '%s'...",
                _joint_name.c_str(), keytime.toSec(), key_value.c_str());
       ros::Time::sleepUntil(keytime);
-      send(vision_utils::cast_from_string<_Type>(_joint_values[key_idx]));
+      send(_joint_values[key_idx]);
     } // end loop key_idx
   }
 
   void gesture_stop() { return; } // nothing to do
 
 protected:
-  void send(const _Type & value) {
+  virtual void send(const std::string & value) {
     _Msg msg;
-    msg.data = value;
+    if (!vision_utils::string2msg<_Msg>(value, msg)) {
+      ROS_WARN("Creating message from string '%s' failed!", value.c_str());
+      return;
+    }
     _pub.publish(msg);
   }
 
   //! the publisher for communicating with the real user
   ros::Publisher _pub;
-};
+}; // end class SimplePlayer
 
 #endif // SIMPLE_PLAYER_H

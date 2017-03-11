@@ -6,7 +6,7 @@ SET(CMAKE_BUILD_TYPE RelWithDebInfo) #None Debug Release RelWithDebInfo MinSizeR
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra") # add extra warnings
 ### 3 - Find other CMake/Catkin packages needed for build
 find_package(catkin REQUIRED COMPONENTS roscpp roslib
-                                        std_msgs  gesture_msgs)
+                                        std_msgs  gesture_msgs  vision_utils)
 ## System dependencies are found with CMake's conventions
 FIND_PACKAGE(Qt4 REQUIRED)
 INCLUDE(${QT_USE_FILE})
@@ -22,11 +22,6 @@ catkin_package(
   DEPENDS gesture_msgs
 )
 ### 7 - Libraries/Executables to build (add_library()/add_executable()/target_link_libraries())
-# get vision_utils includes from SVN
-execute_process( # https://cmake.org/cmake/help/v3.0/command/execute_process.html
-  COMMAND bash svn_vision_utils.bash
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
 include_directories(
   include  ${catkin_INCLUDE_DIRS}  ${CMAKE_CURRENT_BINARY_DIR}
 )

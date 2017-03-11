@@ -14,7 +14,9 @@
   <exec_depend>roscpp</exec_depend>
   <depend>roslib</depend>
   <depend>std_msgs</depend>
+  <!-- Arnaud -->
   <depend>gesture_msgs</depend>
+  <depend>vision_utils</depend>
   <!-- System dependencies -->
   <depend>gnuplot</depend>
   <!-- The export tag contains other, unspecified, tags -->
