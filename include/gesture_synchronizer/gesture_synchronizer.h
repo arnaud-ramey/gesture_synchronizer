@@ -180,9 +180,9 @@ private:
   ///////////////////////////////////////////////////////////////////////////
   void play_gesture() {
     DEBUG_PRINT("play_gesture(%f)", _ack_msg.stamp.toSec());
-    _play_order_publisher.publish(_ack_msg);
     //change status
     _status = WAITING_ACKS;
+    _play_order_publisher.publish(_ack_msg);
   }
 
   ///////////////////////////////////////////////////////////////////////////

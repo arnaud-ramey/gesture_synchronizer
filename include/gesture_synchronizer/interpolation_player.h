@@ -2,7 +2,7 @@
 #define interpolation_player_H
 
 // utils
-//#include <interpolation/interpolator.h>
+#include <vision_utils/interpolator.h>
 #include <vision_utils/gnuplot-cpp/gnuplot_i.hpp>
 #include <vision_utils/accessible_to_string.h>
 #include <vision_utils/timer.h>
@@ -25,20 +25,17 @@
   - send_joint_command_angle()
 
   */
-
+template<class _Msg>
 class InterpolationPlayer : public JointPlayer {
 public:
-  typedef double AngleValue;
-
   //! the maximmum error allowed for sending an ack message
   static const double POSITION_TOLERANCE_ACK = 2E-1;
-
 
   //////////////////////////////////////////////////////////////////////////////
 
   //! ctor - init the plotter
-  InterpolationPlayer()
-  {
+  InterpolationPlayer() {
+    _pub = _nh_public.advertise<_Msg>("out", 1);
     // set plotter to dumb (no X)
     _plotter.set_terminal_std("dumb");
   } // end ctor
@@ -90,25 +87,11 @@ protected:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  /*!
-    Convert a string command order to a joint one
-   \param curr_joint_value
-   \param out
-   \return bool
-  */
-  static inline bool joint_order_to_angle_value
-  (const gesture_synchronizer::JointValue & curr_joint_value, AngleValue & out) {
-    bool success = false;
-    out = vision_utils::cast_from_string<double>(curr_joint_value, success);
-    if (!success)
-      ROS_WARN("could not cast %s to a motor order.",curr_joint_value.c_str());
-    return success;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-
   //! send an order to the joint - must be implemented by children
-  virtual bool send_joint_command_angle(const AngleValue & curr_joint_value) = 0;
+  virtual bool send_joint_command_angle(const _Msg & msg) {
+    _pub.publish(msg);
+    return true;
+  }
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -121,75 +104,19 @@ protected:
     */
   virtual bool gesture_preplay_hook() {
     ROS_INFO("%s:gesture_preplay_hook()", _joint_name.c_str());
-
     // set initial position as not reached
     _is_initial_position_reached = false;
-
-    // convert all _joint_values string values to doubles
-    _joint_values_double.clear();
-    for (unsigned int idx = 0; idx < _joint_values.size(); ++idx) {
-      AngleValue curr_value;
-      bool success =
-          joint_order_to_angle_value(_joint_values[idx], curr_value);
-      if (!success) {
-        ROS_WARN("%s:impossible to set the current gesture.", _joint_name.c_str());
-        return false;
-      }
-      _joint_values_double.push_back(curr_value);
-    } // end loop idx
-
-    // if not enough data, do nothing
-    if (_keytimes.size() == 0) {
-      ROS_INFO_STREAM(_joint_name << ":_keytimes is empty.");
-      return true;
-    }
-
-    // check keys for initial and final gesture
-    gesture_synchronizer::Time gesture_min_time, gesture_max_time;
-    gesture_synchronizer::get_gesture_min_max_times(_current_gesture,
-                                              gesture_min_time, gesture_max_time);
-    // duplicate the first key at time 0
-    if (_keytimes.front() > gesture_min_time) {
-      ROS_INFO_STREAM(_joint_name << ":adding a key at gesture_min_time.");
-      _keytimes.insert(_keytimes.begin(), gesture_min_time);
-      _joint_values_double.insert(_joint_values_double.begin(),
-                                  _joint_values_double.front());
-    }
-    if (_keytimes.back() < gesture_max_time) {
-      ROS_INFO_STREAM(_joint_name << ":adding a key at gesture_max_time.");
-      _keytimes.insert(_keytimes.end(), gesture_max_time);
-      _joint_values_double.insert(_joint_values_double.end(),
-                                  _joint_values_double.back());
-    }
 
     // create data if some is missing
     if (_keytimes.size() == 1) {
       _keytimes.push_back(_keytimes.front() + 1);
-      _keytimes.push_back(_keytimes.front() + 2);
-      _joint_values_double.push_back(_joint_values_double.front());
-      _joint_values_double.push_back(_joint_values_double.front());
+      _joint_values.push_back(_joint_values.front());
       ROS_INFO("%s:there was only one keframe. "
-               "Adding two intermediate keyframes. "
+               "Adding one intermediate keyframe. "
                "keytimes:%s, joint_values:%s",
                _joint_name.c_str(),
                vision_utils::accessible_to_string(_keytimes).c_str(),
                vision_utils::accessible_to_string(_joint_values).c_str());
-    }
-
-    if (_keytimes.size() == 2) {
-      gesture_synchronizer::Time new_keytime =
-          (_keytimes.front() + _keytimes.back()) / 2;
-      AngleValue new_joint_value =
-          (_joint_values_double.front() + _joint_values_double.back()) / 2;
-      _keytimes.insert(_keytimes.begin() + 1, new_keytime);
-      _joint_values_double.insert(_joint_values_double.begin() + 1,
-                                  new_joint_value);
-      ROS_INFO("%s:there were only two keyframes. "
-               "Adding an intermediate keyframe. "
-               "keytimes:%s, joint_values:%s",
-               _joint_name.c_str(),
-               vision_utils::accessible_to_string(_keytimes).c_str(),
-               vision_utils::accessible_to_string(_joint_values_double).c_str());
     }
 
     // restore begin and end times
@@ -199,47 +126,23 @@ protected:
                     << ", _gesture_end_time:" << _gesture_end_time);
 
     // create the interpolator
-    _interpolator.set_points(_keytimes, _joint_values_double);
-    return true;
+    return _interpolator.train(_keytimes, _joint_values);
   } // end gesture_preplay_hook()
 
   //////////////////////////////////////////////////////////////////////////////
 
-  /*! the extension of GestureJointPlayer::send_joint_command()
-    that sends the order to the ros joint topic */
-  virtual void send_joint_command(const gesture_synchronizer::JointValue & joint_value_str) {
-    ROS_INFO_THROTTLE(3, "%s:send_joint_command(%s)",
-                      _joint_name.c_str(), joint_value_str.c_str());
-    // convert to float
-    AngleValue joint_value;
-    bool success = joint_order_to_angle_value(joint_value_str, joint_value);
-    if (!success) {
-      ROS_WARN_STREAM(_joint_name << ": impossible to cast '"
-                      << joint_value_str << "' to a joint value");
-      return;
-    }
-    success = send_joint_command_angle(joint_value);
-    if (!success) {
-      ROS_WARN_STREAM(_joint_name << ": send_joint_command_angle("
-                      << joint_value << ") returned an error code.");
-      return;
-    }
-  } // end send_joint_command();
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  void gesture_play_plot(bool plot_at_end = true, bool plot_at_each_frame = false) {
+  bool gesture_play_plot(bool plot_at_end = true, bool plot_at_each_frame = false) {
     ROS_INFO("%s:gesture_play_plot(id:%f)",
              _joint_name.c_str(), _current_gesture.header.stamp.toSec());
 
     // do nothing if the gesture is empty
     if (_keytimes.size() == 0)
-      return;
+      return true;
 
     vision_utils::Timer _gesture_timer;
     ros::Rate _rate(10); // Hz
     std::vector<gesture_synchronizer::Time> plotter_x;
-    std::vector<AngleValue> plotter_y;
+    std::vector<_Msg> plotter_y;
     if (plot_at_each_frame || plot_at_end) {
       int expected_time_steps = (_gesture_end_time - _gesture_begin_time)
           / _rate.expectedCycleTime().toSec();
@@ -258,8 +161,14 @@ protected:
       }
 
       // get the value of the joint at that time
-      AngleValue curr_joint_value = _interpolator(curr_time_sec);
-      ROS_DEBUG("Time %g sec: emitting %g.", curr_time_sec, curr_joint_value);
+      _Msg curr_joint_value;
+      if (!_interpolator.predict(curr_time_sec, curr_joint_value)) {
+        ROS_WARN("interpolator.predict() at time %g returned an error!",
+                 curr_time_sec);
+        return false;
+      }
+      ROS_DEBUG("Time %g sec: emitting '%s'.", curr_time_sec,
+                vision_utils::msg2string(curr_joint_value).c_str());
       send_joint_command_angle(curr_joint_value);
 
       // plot the stuff
@@ -284,61 +193,35 @@ protected:
       _plotter.set_style("lines").plot_xy(plotter_x, plotter_y, _joint_name);
       _plotter.showonscreen();
     }
-
+    return true;
   } // end gesture_play_plot();
 
   //////////////////////////////////////////////////////////////////////////////
 
-  AngleValue get_initial_joint_value() const {
-    return _interpolator(_gesture_begin_time);
+  _Msg get_initial_joint_value() const {
+    _Msg out;
+    _interpolator.predict(_gesture_begin_time, out);
+    return out;
   }
 
   //////////////////////////////////////////////////////////////////////////////
 
-  AngleValue get_final_joint_value() const {
-    return _interpolator(_gesture_end_time);
+  _Msg get_final_joint_value() const {
+    _Msg out;
+    _interpolator.predict(_gesture_end_time, out);
+    return out;
   }
 
   //////////////////////////////////////////////////////////////////////////////
 
-  std::vector<AngleValue> _joint_values_double;
   //! the interpolator for intermediate positions
-  ::tk::spline _interpolator;
+  vision_utils::Interpolator<_Msg> _interpolator;
   //! the plotter for showing the data
   Gnuplot _plotter;
+  //! the publisher for communicating with the real user
+  ros::Publisher _pub;
 
   bool _is_initial_position_reached;
 }; // end class InterpolationPlayer
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-template<class _Msg>
-class MyInterpolationPlayer : public InterpolationPlayer {
-public:
-  //! alias for the C type: bool, int, float, etc.
-  typedef typename _Msg::_data_type  _Type;
-
-  MyInterpolationPlayer() {
-    _pub = _nh_public.advertise<_Msg>("out", 1);
-  }
-
-  void gesture_go_to_initial_position() {
-    if (!_joint_values.empty())
-      send_joint_command_angle(vision_utils::cast_from_string
-                               <InterpolationPlayer::AngleValue>(_joint_values.front()));
-  }
-
-protected:
-  bool send_joint_command_angle(const InterpolationPlayer::AngleValue & curr_joint_value) {
-    _Msg msg;
-    msg.data = curr_joint_value;
-    _pub.publish(msg);
-    return true;
-  }
-
-  //! the publisher for communicating with the real user
-  ros::Publisher _pub;
-}; // end class MyInterpolationPlayer
 
 #endif // interpolation_player_H

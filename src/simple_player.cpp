@@ -59,6 +59,16 @@ int main(int argc, char** argv) {
     launcher<std_msgs::ColorRGBA>();
   else if (joint_type == "string")
     launcher<std_msgs::String>();
+
+  //TEST(TestSuite, Point32)   { test_suite<geometry_msgs::Point32>(3); }
+  //TEST(TestSuite, Point)     { test_suite<geometry_msgs::Point>(3); }
+  //TEST(TestSuite, Vector3)   { test_suite<geometry_msgs::Vector3>(3); }
+  //TEST(TestSuite, Pose2D)    { test_suite<geometry_msgs::Pose2D>(3); }
+  //TEST(TestSuite, Quaternion){ test_suite<geometry_msgs::Quaternion>(4); }
+  //TEST(TestSuite, Accel)     { test_suite<geometry_msgs::Accel>(6); }
+  //TEST(TestSuite, Twist)     { test_suite<geometry_msgs::Twist>(6); }
+  //TEST(TestSuite, Pose)      { test_suite<geometry_msgs::Pose>(7); }
+
   else {
     ROS_FATAL("The joint type '%s' is unknown", joint_type.c_str());
   }

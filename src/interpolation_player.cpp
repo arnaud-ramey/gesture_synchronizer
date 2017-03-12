@@ -1,5 +1,4 @@
 // ROS
-#include "std_msgs/String.h"
 #include <std_msgs/Bool.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/Int8.h>
@@ -16,10 +15,10 @@
 #include <vision_utils/to_lowercase.h>
 #include <vision_utils/cast_from_string.h>
 
-//! instantiate a MyInterpolationPlayer
+//! instantiate a InterpolationPlayer
 template<class T>
 void launcher() {
-  MyInterpolationPlayer<T> player;
+  InterpolationPlayer<T> player;
   ROS_INFO("Starting a simple_player with name '%s'",
            player.get_joint_name().c_str());
   ros::spin();
@@ -31,8 +30,8 @@ int main(int argc, char** argv) {
   std::string joint_type = "";
   nh_private.param("joint_type", joint_type, joint_type);
   vision_utils::to_lowercase(joint_type);
-  if (joint_type == "string")
-    launcher<std_msgs::String>();
+  if (joint_type == "empty")
+    launcher<std_msgs::Empty>();
   else if (joint_type == "bool")
     launcher<std_msgs::Bool>();
   else if (joint_type == "uint8")
@@ -55,6 +54,18 @@ int main(int argc, char** argv) {
     launcher<std_msgs::Float32>();
   else if (joint_type == "float64")
     launcher<std_msgs::Float64>();
+  // Color
+
+  //TEST(TestSuite, Point32)   { test_suite<geometry_msgs::Point32>(3); }
+  //TEST(TestSuite, Point)     { test_suite<geometry_msgs::Point>(3); }
+  //TEST(TestSuite, Vector3)   { test_suite<geometry_msgs::Vector3>(3); }
+  //TEST(TestSuite, Pose2D)    { test_suite<geometry_msgs::Pose2D>(3); }
+  //TEST(TestSuite, Quaternion){ test_suite<geometry_msgs::Quaternion>(4); }
+  //TEST(TestSuite, Accel)     { test_suite<geometry_msgs::Accel>(6); }
+  //TEST(TestSuite, Twist)     { test_suite<geometry_msgs::Twist>(6); }
+  //TEST(TestSuite, Pose)      { test_suite<geometry_msgs::Pose>(7); }
+
+
   else {
     ROS_FATAL("The joint type '%s' is unknown", joint_type.c_str());
   }
