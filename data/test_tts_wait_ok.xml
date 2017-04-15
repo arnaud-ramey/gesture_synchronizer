@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<gestures>
+  <gesture keytime="0" joint_name="tts" joint_value="Wait"/>
+  <gesture keytime="1" joint_name="tts" joint_value="OK"/>
+</gestures>
+

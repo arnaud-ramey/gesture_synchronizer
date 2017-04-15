@@ -21,22 +21,24 @@ $ rostopic pub -1 /keyframe_gesture_filename std_msgs/String "\$(find gesture_sy
       name="left_eye2" args="_joint_type:=bool  out:=/left_eye2/state"/>
 
 <!-- chest LED player -->
+<!--
 <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
       name="chest" args="_joint_type:=color  out:=/chest/color"/>
+-->
+<node pkg="gesture_synchronizer" type="interpolation_player.exe" output="screen" required="true"
+      name="chest" args="_joint_type:=color  out:=/chest/color"/>
 
-<!-- picotts (Text to Speech) -->
-<node pkg="picotts" type="picotts.exe" name="picotts"
-      output="screen" required="false" args="_engine:=pico2wave"/>
-<node pkg="picotts" type="tts2notify.exe" name="tts2notify"
-      output="screen" required="false">
-  <remap from="tts" to="notify"/>
-</node>
-<!-- picotts player -->
+<!-- MiP sounds -->
+<node pkg="rosmip" type="sound_player.exe" name="mip_sp"
+      output="screen" required="false"/>
+<!-- mip_sound_player player -->
 <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
-      name="tts" args="_joint_type:=string  out:=/tts"/>
+      name="mip_sound" args="_joint_type:=Int16  out:=/sound"/>
 
 <!--
-<node pkg="gesture_synchronizer" type="gesture_gui.exe" output="screen" required="true"
-      name="gui" args="_joints:=tts:string;notify:string" />
--->
+  tester: emit one gesture every three seconds
+  -->
+<node pkg="rostopic" type="rostopic" name="gesture_pub"
+      args="pub -r 0.33 /keyframe_gesture_filename std_msgs/String \$(find gesture_synchronizer)/data/test_mip_left_right_eyes" />
+
 </launch>

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<gestures>
+  <gesture keytime="0"   joint_name="right_eye1" joint_value="1"/>
+  <gesture keytime="0"   joint_name="chest" joint_value="1;0;0;1"/>
+  <gesture keytime="0"   joint_name="mip_sound" joint_value="23"/>
+
+  <gesture keytime="0.25" joint_name="right_eye1" joint_value="0"/>
+  <gesture keytime="0.25" joint_name="right_eye2" joint_value="1"/>
+
+  <gesture keytime="0.5" joint_name="right_eye2" joint_value="0"/>
+  <gesture keytime="0.5" joint_name="left_eye1" joint_value="1"/>
+
+  <gesture keytime="0.75" joint_name="left_eye1" joint_value="0"/>
+  <gesture keytime="0.75" joint_name="left_eye2" joint_value="1"/>
+
+  <gesture keytime="1" joint_name="left_eye2" joint_value="0"/>
+  <gesture keytime="1" joint_name="chest" joint_value="0;1;0;1"/>
+  <gesture keytime="1" joint_name="mip_sound" joint_value="16"/>
+</gestures>
+

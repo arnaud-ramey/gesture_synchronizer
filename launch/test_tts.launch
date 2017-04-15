@@ -1,0 +1,23 @@
+<launch>
+<!-- to test:
+$ rostopic pub -1 /keyframe_gesture_filename std_msgs/String "\$(find gesture_synchronizer)/data/mip_left_right_eyes"
+-->
+
+<node pkg="gesture_synchronizer" type="gesture_synchronizer.exe" output="screen" required="true"
+      name="sync" args="" />
+
+<!-- picotts (Text to Speech) -->
+<node pkg="picotts" type="picotts.exe" name="picotts"
+      output="screen" required="false" args="_engine:=pico2wave"/>
+<node pkg="picotts" type="tts2notify.exe" name="tts2notify"
+      output="screen" required="false"/>
+<!-- picotts player -->
+<node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
+      name="tts" args="_joint_type:=string  out:=/tts"/>
+
+<!--
+  tester: emit one gesture every three seconds
+  -->
+<node pkg="rostopic" type="rostopic" name="gesture_pub"
+      args="pub -r 0.33 /keyframe_gesture_filename std_msgs/String \$(find gesture_synchronizer)/data/test_tts_wait_ok" />
+</launch>

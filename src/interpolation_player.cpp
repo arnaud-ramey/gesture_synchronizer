@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
   std::string joint_type = "";
   nh_private.param("joint_type", joint_type, joint_type);
   vision_utils::to_lowercase(joint_type);
+  // std_msgs
   if (joint_type == "empty")
     launcher<std_msgs::Empty>();
   else if (joint_type == "bool")
@@ -54,17 +55,27 @@ int main(int argc, char** argv) {
     launcher<std_msgs::Float32>();
   else if (joint_type == "float64")
     launcher<std_msgs::Float64>();
-  // Color
-
-  //TEST(TestSuite, Point32)   { test_suite<geometry_msgs::Point32>(3); }
-  //TEST(TestSuite, Point)     { test_suite<geometry_msgs::Point>(3); }
-  //TEST(TestSuite, Vector3)   { test_suite<geometry_msgs::Vector3>(3); }
-  //TEST(TestSuite, Pose2D)    { test_suite<geometry_msgs::Pose2D>(3); }
-  //TEST(TestSuite, Quaternion){ test_suite<geometry_msgs::Quaternion>(4); }
-  //TEST(TestSuite, Accel)     { test_suite<geometry_msgs::Accel>(6); }
-  //TEST(TestSuite, Twist)     { test_suite<geometry_msgs::Twist>(6); }
-  //TEST(TestSuite, Pose)      { test_suite<geometry_msgs::Pose>(7); }
-
+  else if (joint_type == "color")
+    launcher<std_msgs::ColorRGBA>();
+  else if (joint_type == "string")
+    ROS_FATAL("Cannot interpolate strings!");
+  // geometry msgs
+  else if (joint_type == "accel")
+    launcher<geometry_msgs::Accel>();
+  else if (joint_type == "point32")
+    launcher<geometry_msgs::Point32>();
+  else if (joint_type == "point")
+    launcher<geometry_msgs::Point>();
+  else if (joint_type == "pose2d")
+    launcher<geometry_msgs::Pose2D>();
+  else if (joint_type == "pose")
+    launcher<geometry_msgs::Pose>();
+  else if (joint_type == "quaternion")
+    launcher<geometry_msgs::Quaternion>();
+  else if (joint_type == "twist")
+    launcher<geometry_msgs::Twist>();
+  else if (joint_type == "vector3")
+    launcher<geometry_msgs::Vector3>();
 
   else {
     ROS_FATAL("The joint type '%s' is unknown", joint_type.c_str());

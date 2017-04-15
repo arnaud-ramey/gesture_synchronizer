@@ -17,7 +17,7 @@ public:
   static const double RESOLUTION_TIME = 0.1; //seconds
 
   JointPlayer(const std::string & joint_name = "") :
-    _nh_private("~")
+    _nh_private("~"), _rate(10)
   {
     // set status as idle
     _current_status = StatusIdle;
@@ -31,6 +31,11 @@ public:
     }
     else
       _joint_name = joint_name;
+
+    // get rate
+    double rate = 10; // Hz
+    _nh_private.param("rate", rate, rate);
+    _rate = ros::Rate(rate);
 
     // init _gesture_subscriber
     _gesture_subscriber = _nh_public.subscribe
@@ -287,6 +292,7 @@ protected:
 
 
   // ///  data for the motion
+  ros::Rate _rate;
   gesture_synchronizer::JointName _joint_name;
   std::vector<gesture_synchronizer::Time> _keytimes;
   std::vector<gesture_synchronizer::JointValue> _joint_values;

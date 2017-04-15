@@ -28,11 +28,6 @@
 template<class _Msg>
 class InterpolationPlayer : public JointPlayer {
 public:
-  //! the maximmum error allowed for sending an ack message
-  static const double POSITION_TOLERANCE_ACK = 2E-1;
-
-  //////////////////////////////////////////////////////////////////////////////
-
   //! ctor - init the plotter
   InterpolationPlayer() {
     _pub = _nh_public.advertise<_Msg>("out", 1);
@@ -107,6 +102,12 @@ protected:
     // set initial position as not reached
     _is_initial_position_reached = false;
 
+    // IMPORTANT
+    // in the InterpolationPlayer case,
+    // we consider the initial position is immediatly reached
+    // change this in children cases that are not instantaneous, e.g. motors
+    _is_initial_position_reached = true;
+
     // create data if some is missing
     if (_keytimes.size() == 1) {
       _keytimes.push_back(_keytimes.front() + 1);
@@ -140,7 +141,6 @@ protected:
       return true;
 
     vision_utils::Timer _gesture_timer;
-    ros::Rate _rate(10); // Hz
     std::vector<gesture_synchronizer::Time> plotter_x;
     std::vector<_Msg> plotter_y;
     if (plot_at_each_frame || plot_at_end) {

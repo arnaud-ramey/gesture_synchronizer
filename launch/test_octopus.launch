@@ -1,0 +1,26 @@
+<launch>
+<!-- to test:
+$ rostopic pub -1 /keyframe_gesture_filename std_msgs/String "\$(find gesture_synchronizer)/data/octopus_left_right_eyes"
+-->
+
+<node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" required="true">
+  <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_octopus.xml"/>
+</node>
+
+<node pkg="gesture_synchronizer" type="gesture_synchronizer.exe" output="screen" required="true"
+      name="sync" args="" />
+
+<!-- eye LEDS player -->
+<node pkg="gesture_synchronizer" type="interpolation_player.exe" output="screen" required="true"
+      name="iris" args="_rate:=15  _joint_type:=Point  out:=/avatar/iris_position"/>
+<!-- mouth LEDS player -->
+<node pkg="gesture_synchronizer" type="interpolation_player.exe" output="screen" required="true"
+      name="volume" args="_rate:=15  _joint_type:=Float64  out:=/avatar/mouth_vol"/>
+
+<!--
+  tester: emit one gesture every three seconds
+  -->
+<node pkg="rostopic" type="rostopic" name="gesture_pub"
+      args="pub -r 0.33 /keyframe_gesture_filename std_msgs/String \$(find gesture_synchronizer)/data/test_octopus_circle" />
+
+</launch>

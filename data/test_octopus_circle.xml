@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<gestures>
+  <gesture keytime="0"   joint_name="volume"joint_value="0.5"/>
+  <gesture keytime="0"   joint_name="iris"  joint_value="0;  0;   0"/>
+  <gesture keytime=".5"  joint_name="iris"  joint_value=".7; 0;   0"/>
+  <gesture keytime="1"   joint_name="iris"  joint_value="0;  -.7; 0"/>
+  <gesture keytime="1.5" joint_name="iris"  joint_value="-.7;0;   0"/>
+  <gesture keytime="2"   joint_name="iris"  joint_value="0;  .7;  0"/>
+  <gesture keytime="2"   joint_name="volume"joint_value="0.9"/>
+  <gesture keytime="2.5" joint_name="iris"  joint_value="0;  0;   0"/>
+  <gesture keytime="2.5" joint_name="volume"joint_value="0.5"/>
+</gestures>
