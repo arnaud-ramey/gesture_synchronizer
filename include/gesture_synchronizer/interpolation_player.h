@@ -70,7 +70,7 @@ public:
         - _joint_values  , containing the string values of the wanted joint
     */
   virtual void gesture_play() {
-    ROS_INFO("%s:gesture_play(id:%f, %li keytimes)",
+    ROS_DEBUG("%s:gesture_play(id:%f, %li keytimes)",
              _joint_name.c_str(), _current_gesture.header.stamp.toSec(),
              _keytimes.size());
     gesture_play_plot(false, false);

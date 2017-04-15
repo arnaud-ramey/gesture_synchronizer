@@ -17,13 +17,13 @@ public:
   bool gesture_preplay_hook() { return true; } // nothing to do
   void gesture_go_to_initial_position() {
     //if (!_joint_values.empty())
-      //send(vision_utils::cast_from_string<_Type>(_joint_values.front()));
+    //send(vision_utils::cast_from_string<_Type>(_joint_values.front()));
   }
 
   void gesture_play() {
-    ROS_INFO("%s:gesture_play(id:%f, %li keytimes)",
-             _joint_name.c_str(), _current_gesture.header.stamp.toSec(),
-             _keytimes.size());
+    ROS_DEBUG("%s:gesture_play(id:%f, %li keytimes)",
+              _joint_name.c_str(), _current_gesture.header.stamp.toSec(),
+              _keytimes.size());
     ros::Time start_time = ros::Time::now();
 
     for (unsigned int key_idx = 0; key_idx < _keytimes.size(); ++key_idx) {

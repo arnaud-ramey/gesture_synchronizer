@@ -20,6 +20,11 @@ static const std::string gesture_topic = "keyframe_gesture";
 
 /*! the default gesture topic.
     There are exchanged messages of type
+    gesture_synchronizer/KeyframeGesture */
+static const std::string gesture_topic_sync = "keyframe_gesture_sync";
+
+/*! the default gesture topic.
+    There are exchanged messages of type
     std_msgs::String */
 static const std::string gesture_filename_topic = "keyframe_gesture_filename";
 

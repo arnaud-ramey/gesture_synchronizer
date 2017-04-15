@@ -11,8 +11,8 @@
 #include "gesture_io.h"
 #include "gesture_msgs/KeyframeGesture.h"
 
-//#define DEBUG_PRINT(...)   {}
-#define DEBUG_PRINT(...)   ROS_INFO("GestureSynchronizer:" __VA_ARGS__)
+#define DEBUG_PRINT(...)   {}
+//#define DEBUG_PRINT(...)   ROS_INFO("GestureSynchronizer:" __VA_ARGS__)
 
 enum Status {
   IDLE = 0,
@@ -25,7 +25,7 @@ public:
 
   GestureSynchronizer() {
     _gesture_synchronizer = _nh_public.advertise<gesture_msgs::KeyframeGesture>
-        (gesture_synchronizer::gesture_topic, 1);
+        (gesture_synchronizer::gesture_topic_sync, 1);
     _ack_subscriber = _nh_public.subscribe
         (gesture_synchronizer::ack_topic, 100,
          &GestureSynchronizer::ack_callback, this);
@@ -67,7 +67,9 @@ public:
 
     //wait for ack   (timeout = 3s)
     if (!waitForAck(3)) {
-      ROS_WARN("Still alive timeout exceeded");
+      ROS_WARN("Timeout while waiting for acks, %li acks missing:%s",
+               _missing_acks.size(),
+               vision_utils::iterable_to_string(_missing_acks).c_str());
       return false;
     }
 
@@ -87,8 +89,8 @@ public:
       return false;
     }
 
-    DEBUG_PRINT("Gesture with stamp %f: gesture is over.",
-                gesture.header.stamp.toSec());
+    ROS_INFO("Gesture with stamp %f: gesture is over.",
+             gesture.header.stamp.toSec());
     _status = IDLE;
     return true;
   }
@@ -137,15 +139,9 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   bool readFile(const std::string fileName,
                 gesture_msgs::KeyframeGesture & gesture) {
-
-    //create path
-    std::ostringstream xml_full_path;
-    xml_full_path << gesture_synchronizer::gesture_files_folder() << "/"
-                  << fileName << ".xml";
-
     //read
     bool success = gesture_synchronizer::load_from_xml_file
-        (gesture, xml_full_path.str());
+        (gesture, fileName);
 
     return success;
   }

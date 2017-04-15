@@ -24,14 +24,17 @@ public:
     _abort_sleep = false;
 
     // get joint name from params if not supplied
-    if (joint_name.empty())
-    _nh_private.param<gesture_synchronizer::JointName>("joint_name", _joint_name, "joint_name");
+    if (joint_name.empty()) {
+      _nh_private.param<gesture_synchronizer::JointName>("joint_name", _joint_name, "");
+      if (_joint_name.empty())
+        _joint_name = _nh_private.getNamespace().substr(1);
+    }
     else
       _joint_name = joint_name;
 
     // init _gesture_subscriber
     _gesture_subscriber = _nh_public.subscribe
-        (gesture_synchronizer::gesture_topic, 1,
+        (gesture_synchronizer::gesture_topic_sync, 1,
          &JointPlayer::gesture_cb, this);
 
     // init _gesture_ack_publisher
@@ -91,8 +94,8 @@ public:
    \param gesture
   */
   void gesture_cb(const gesture_msgs::KeyframeGesture & gesture) {
-    ROS_INFO("%s:gesture_cb(%f)", _joint_name.c_str(),
-             gesture.header.stamp.toSec());
+    ROS_DEBUG("%s:gesture_cb(%f)", _joint_name.c_str(),
+              gesture.header.stamp.toSec());
     // make a local copy
     _current_gesture = gesture;
 
@@ -114,9 +117,9 @@ public:
     // send the ack
     if (_keytimes.size() == 0) {
       ROS_DEBUG("%s:The gesture with id:%f does not contain keyframes "
-                "for this joint. Sending an ack.",
+                "for this joint. No need to send an ack.",
                 _joint_name.c_str(), gesture.header.stamp.toSec());
-      publish_ack_for_current_gesture();
+      //publish_ack_for_current_gesture(); // not needed
       _current_status = StatusIdle;
       return;
     }
@@ -206,8 +209,8 @@ protected:
 
   //! send an ack to confirm the joint is at initial position.
   inline void publish_ack_for_current_gesture() {
-    ROS_INFO("%s:publish_ack_for_current_gesture(id:%f)",
-             _joint_name.c_str(), _current_gesture.header.stamp.toSec());
+    ROS_DEBUG("%s:publish_ack_for_current_gesture(id:%f)",
+              _joint_name.c_str(), _current_gesture.header.stamp.toSec());
     gesture_synchronizer::Ack msg;
     msg.stamp = _current_gesture.header.stamp;
     msg.frame_id = _joint_name;
@@ -220,9 +223,9 @@ protected:
   /*! the callback when we receive a play order.
     If it is the current gesture, we will play it, then return to idle. */
   void play_order_callback(const gesture_synchronizer::Ack & msg) {
-    ROS_INFO("%s:play_order_callback(id:%f)",
-             _joint_name.c_str(),
-             _current_gesture.header.stamp.toSec());
+    ROS_DEBUG("%s:play_order_callback(id:%f)",
+              _joint_name.c_str(),
+              _current_gesture.header.stamp.toSec());
 
     // if the play order corresponds to our gesture, play it
     if (_current_status == StatusWaitingForPlayOrder) {

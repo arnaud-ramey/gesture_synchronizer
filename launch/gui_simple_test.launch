@@ -1,7 +1,7 @@
 <launch>
 <!-- the gesture synthesiser -->
 <!--
-<node pkg="gesture_player" type="gesture_screens_player_ros" output="screen"
+<node pkg="gesture_synchronizer" type="gesture_screens_player_ros" output="screen"
       name="gesture_screens_player_ros" args="_joint_name:=screens" />
 -->
 <node pkg="picotts" type="picotts.exe" name="picotts"
@@ -13,10 +13,10 @@
 
 <!-- the gesture_string_publisher ,
 converting XML filenames into proper gestures -->
-<node pkg="gesture_player" type="gesture_string_publisher" output="screen"
+<node pkg="gesture_synchronizer" type="gesture_string_publisher" output="screen"
   name="gesture_string_publisher" args="" />
 
-<node pkg="gesture_player" type="gesture_gui.exe" output="screen" required="true"
+<node pkg="gesture_synchronizer" type="gesture_gui.exe" output="screen" required="true"
       name="gui" args="_joints:=tts:string;notify:string" />
 
 </launch>

@@ -94,7 +94,7 @@ void gesture_cb(const gesture_msgs::KeyframeGesture & gesture){
   In this callback it is necessary to order the message queue depending on msg demands
 */
 void gesture_filename_cb(const std_msgs::StringConstPtr & msg) {
-  ROS_WARN("gesture_filename_cb('%s')", msg->data.c_str());
+  ROS_INFO("gesture_filename_cb('%s')", msg->data.c_str());
 
   std::vector<std::string> fileName_priority;
   vision_utils::StringSplit(msg->data.c_str(), ";", &fileName_priority);
@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
   gesture_pub = new GestureSynchronizer();
   _stop = false;
 
-  ROS_WARN("gesture_synchronizer: getting XML filenames from '%s', "
+  ROS_INFO("gesture_synchronizer: getting XML filenames from '%s', "
            "republishing them to '%s'",
            nh_public.resolveName(gesture_synchronizer::gesture_filename_topic).c_str(),
            gesture_pub->get_gesture_topic().c_str());
@@ -174,9 +174,7 @@ int main(int argc, char** argv) {
     else if(!_gestures_queue.empty()){
       gesture_msgs::KeyframeGesture gesture = _gestures_queue.front();
       _gestures_queue.pop_front();
-      ROS_WARN("START GESTURE");
       gesture_pub->publish_gesture_and_wait(gesture);
-      ROS_WARN("GESTURE END ");
     }
 
     ros::spinOnce();

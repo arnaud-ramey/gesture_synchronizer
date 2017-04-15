@@ -58,6 +58,7 @@ TEST(TestSuite, empty_gesture) {
   GestureSynchronizer gs;
   gesture_msgs::KeyframeGesture gesture;
   ASSERT_TRUE(gs.publish_gesture_and_wait(gesture));
+  ASSERT_TRUE_TIMEOUT(gs.getStatus() == IDLE, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +92,7 @@ void test_simple(std::vector<_T> & cb_vals,
   // check joint value was effectively sent
   ASSERT_TRUE_TIMEOUT(cb_vals.size() == 1, 1) << vision_utils::iterable_to_string(cb_vals);
   ASSERT_TRUE(cb_vals.front() == exp_value)   << vision_utils::iterable_to_string(cb_vals);
+  ASSERT_TRUE_TIMEOUT(gs.getStatus() == IDLE, 1);
 }
 
 TEST(TestSuite, publish_simple_Empty) {
@@ -121,6 +123,7 @@ TEST(TestSuite, publish_no_number) {
   sleep(1);
   // check joint value was effectively sent
   ASSERT_TRUE_TIMEOUT(cb_Int8_vals.size() == 0, 1) << cb_Int8_vals2str();
+  ASSERT_TRUE_TIMEOUT(gs.getStatus() == IDLE, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

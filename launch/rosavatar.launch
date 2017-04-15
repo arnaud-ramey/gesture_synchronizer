@@ -1,0 +1,42 @@
+<launch>
+<!-- to test:
+$ rostopic pub -1 /keyframe_gesture_filename std_msgs/String "\$(find gesture_synchronizer)/data/mip_left_right_eyes"
+-->
+
+<node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" required="true">
+  <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_mip.xml"/>
+</node>
+
+<node pkg="gesture_synchronizer" type="gesture_synchronizer.exe" output="screen" required="true"
+      name="sync" args="" />
+
+<!-- eye LEDS players -->
+<node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
+      name="right_eye1" args="_joint_type:=bool  out:=/right_eye1/state"/>
+<node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
+      name="right_eye2" args="_joint_type:=bool  out:=/right_eye2/state"/>
+<node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
+      name="left_eye1" args="_joint_type:=bool  out:=/left_eye1/state"/>
+<node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
+      name="left_eye2" args="_joint_type:=bool  out:=/left_eye2/state"/>
+
+<!-- chest LED player -->
+<node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
+      name="chest" args="_joint_type:=color  out:=/chest/color"/>
+
+<!-- picotts (Text to Speech) -->
+<node pkg="picotts" type="picotts.exe" name="picotts"
+      output="screen" required="false" args="_engine:=pico2wave"/>
+<node pkg="picotts" type="tts2notify.exe" name="tts2notify"
+      output="screen" required="false">
+  <remap from="tts" to="notify"/>
+</node>
+<!-- picotts player -->
+<node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
+      name="tts" args="_joint_type:=string  out:=/tts"/>
+
+<!--
+<node pkg="gesture_synchronizer" type="gesture_gui.exe" output="screen" required="true"
+      name="gui" args="_joints:=tts:string;notify:string" />
+-->
+</launch>

@@ -19,7 +19,7 @@
 template<class T>
 void launcher() {
   InterpolationPlayer<T> player;
-  ROS_INFO("Starting a simple_player with name '%s'",
+  ROS_INFO("Starting a simple_player with joint name '%s'",
            player.get_joint_name().c_str());
   ros::spin();
 }

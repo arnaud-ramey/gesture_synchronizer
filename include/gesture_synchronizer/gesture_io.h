@@ -14,9 +14,10 @@
 // ROS
 #include <ros/ros.h>
 // gesture_synchronizer
-#include "vision_utils/XmlDocument.h"
 #include "gesture_definitions.h"
+#include "vision_utils/XmlDocument.h"
 #include <vision_utils/sort_utils.h>
+#include <vision_utils/replace_find_tags.h>
 
 namespace gesture_synchronizer {
 typedef double Time;
@@ -276,17 +277,12 @@ inline bool load_inner_xml_file(vision_utils::XmlDocument & doc, KeyframeGesture
     double gap=
         doc.get_node_attribute<double>(files_nodes[key_idx], "gap", 0);
 
-    //create path
-    std::ostringstream xml_full_path;
-    xml_full_path << gesture_synchronizer::gesture_files_folder() << "/"
-                  << fileName << ".xml";
-
     //read file
-    if(!load_from_xml_file2(gesture,xml_full_path.str(), keytime))
+    if(!load_from_xml_file2(gesture, fileName, keytime))
       return false;
     //read the other reps
     for (int rep = 1; rep < repetitions; ++rep) {
-      if(!load_from_xml_file2(gesture,xml_full_path.str(), keytime+(gap*rep)))
+      if(!load_from_xml_file2(gesture, fileName, keytime+(gap*rep)))
         return false;
     }
 
@@ -303,9 +299,17 @@ inline bool load_from_xml_file2(KeyframeGesture & gesture,
                                 const std::string & xml_filename, const double startTime) {
 
   ROS_INFO("load_from_xml_file2:  %s",xml_filename.c_str());
+  //create path
+  std::string xml_filename_clean = vision_utils::replace_find_tags(xml_filename);
+  // convert relative path to absolute if needed
+  if (xml_filename_clean.empty() || xml_filename_clean[0] != '/')
+    xml_filename_clean = gesture_synchronizer::gesture_files_folder() + xml_filename_clean;
+  // add XML extension if needed
+  if (xml_filename_clean.find(".xml") == std::string::npos)
+    xml_filename_clean = xml_filename_clean + ".xml";
   // read xml
   vision_utils::XmlDocument doc;
-  bool xml_read_success = doc.load_from_file(xml_filename);
+  bool xml_read_success = doc.load_from_file(xml_filename_clean);
   if(!xml_read_success)
     return false;
 
