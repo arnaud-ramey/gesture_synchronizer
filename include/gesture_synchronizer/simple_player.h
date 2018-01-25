@@ -12,6 +12,8 @@ public:
                const std::string & out_topic_name = "out")
     : JointPlayer(joint_name) {
     _pub = _nh_public.advertise<_Msg>(out_topic_name, 1);
+    ROS_INFO("SimplePlayer: joint '%s' -> topic '%s'",
+              _joint_name.c_str(), _pub.getTopic().c_str());
   }
 
   bool gesture_preplay_hook() { return true; } // nothing to do

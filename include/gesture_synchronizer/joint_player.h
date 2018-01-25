@@ -26,8 +26,10 @@ public:
     // get joint name from params if not supplied
     if (joint_name.empty()) {
       _nh_private.param<gesture_synchronizer::JointName>("joint_name", _joint_name, "");
-      if (_joint_name.empty())
-        _joint_name = _nh_private.getNamespace().substr(1);
+      if (_joint_name.empty()) {
+        _joint_name = ros::this_node::getName(); // includes namespace
+        _joint_name = _joint_name.substr(1+_joint_name.find_last_of('/')); // remove namespace
+      }
     }
     else
       _joint_name = joint_name;

@@ -33,6 +33,8 @@ public:
     _pub = _nh_public.advertise<_Msg>("out", 1);
     // set plotter to dumb (no X)
     _plotter.set_terminal_std("dumb");
+    ROS_INFO("InterpolationPlayer: joint '%s' -> topic '%s'",
+              _joint_name.c_str(), _pub.getTopic().c_str());
   } // end ctor
 
   //////////////////////////////////////////////////////////////////////////////

@@ -1,37 +1,49 @@
 <launch>
+<!--
+ * /chest/color [std_msgs/ColorRGBA]
+ * /keyframe_gesture_filename [std_msgs/String]
+ * /left_eye1/state [std_msgs/Bool]
+ * /left_eye2/state [std_msgs/Bool]
+ * /right_eye1/state [std_msgs/Bool]
+ * /right_eye2/state [std_msgs/Bool]
+
+Real MIP:
+ * /rosmip/chest_led_blink [std_msgs/Float32MultiArray]
+ * /rosmip/chest_led [std_msgs/ColorRGBA]
+ * /rosmiphead_led [std_msgs/UInt8MultiArray]
+ * /rosmip/sharp_turn_speed [std_msgs/Float32MultiArray]
+ * /rosmip/sharp_turn [std_msgs/Float32]
+ * /rosmip/sound [std_msgs/Int16]
+
+-->
+
 <arg name="robot" default="rosmip" />
+
+<include file="$(find rosmip)/launch/rosmip.launch">
+  <arg name="robot" value="$(arg robot)" />
+</include>
+
 <group ns="$(arg robot)">
   <!-- to test:
   $ rostopic pub -1 /keyframe_gesture_filename std_msgs/String "\$(find gesture_synchronizer)/data/mip_left_right_eyes"
   -->
-
-  <node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" required="true">
-    <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_mip.xml"/>
-  </node>
-
   <node pkg="gesture_synchronizer" type="gesture_synchronizer.exe" output="screen" required="true"
         name="sync" args="" />
 
   <!-- eye LEDS players -->
   <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
-        name="right_eye1" args="_joint_type:=bool  out:=right_eye1/state"/>
+        name="right_eye1" args="_joint_type:=bool  out:=head_led4"/>
   <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
-        name="right_eye2" args="_joint_type:=bool  out:=right_eye2/state"/>
+        name="right_eye2" args="_joint_type:=bool  out:=head_led3"/>
   <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
-        name="left_eye1" args="_joint_type:=bool  out:=left_eye1/state"/>
+        name="left_eye1" args="_joint_type:=bool  out:=head_led2"/>
   <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
-        name="left_eye2" args="_joint_type:=bool  out:=left_eye2/state"/>
+        name="left_eye2" args="_joint_type:=bool  out:=head_led1"/>
 
   <!-- chest LED player -->
-  <!--
-  <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
-  -->
   <node pkg="gesture_synchronizer" type="interpolation_player.exe" output="screen" required="true"
-        name="chest" args="_joint_type:=color  out:=chest/color"/>
+        name="chest" args="_joint_type:=color  _rate:=1  out:=chest_led"/>
 
-  <!-- MiP sounds -->
-  <node pkg="rosmip" type="sound_player.exe" name="mip_sp"
-        output="screen" required="false"/>
   <!-- mip_sound_player player -->
   <node pkg="gesture_synchronizer" type="simple_player.exe" output="screen" required="true"
         name="mip_sound" args="_joint_type:=Int16  out:=sound"/>
@@ -40,7 +52,7 @@
     tester: emit one gesture every three seconds
     -->
   <node pkg="rostopic" type="rostopic" name="gesture_pub"
-        args="pub -r 0.33 keyframe_gesture_filename std_msgs/String \$(find gesture_synchronizer)/data/test_mip_left_right_eyes" />
+        args="pub -r 0.33  keyframe_gesture_filename std_msgs/String \$(find gesture_synchronizer)/data/test_mip_left_right_eyes" />
 
 </group>
 </launch>
